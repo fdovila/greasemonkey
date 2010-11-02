@@ -1,5 +1,5 @@
-// version 0.1 ALPHA!
-// 2010-10-20
+// version 0.1 BETA!
+// 2010-11-02
 // Copyright (c) 2010, Christian Angermann
 // Released under the GPL license
 // http://www.gnu.org/copyleft/gpl.html
@@ -48,10 +48,30 @@ for (var i = messages.length-1; i >= 0; i--) {
 var form = document.createElement('div');
 form.id = 'basecamp';
 form.innerHTML = '<div class="content">' +
-    '<input class="account" value="" />' + 
-    '<input class="repository" value="" />' +
+    '<div class="gm-basecamp">' +
+      '<h3>Basecamp todos</h3>' +
+      '<div>'+
+        '<label for="gm-prefix">Suffix</label>' + 
+        '<input id="gm-prefix" value="" />' + 
+      '</div>'+
+      '<div>'+
+        '<label for="gm-suffix">Prefix</label>' + 
+        '<input id="gm-suffix" value="" />' + 
+      '</div>'+
+    '</div>' + 
+    '<div class="gm-github">' +
+      '<h3>github</h3>' +
+      '<div>'+
+        '<label for="gm-account">Account</label>' + 
+        '<input id="gm-account" value="" />' +
+      '</div>'+
+      '<div>'+
+        '<label for="gm-repo">Repository</label>' + 
+        '<input id="gm-repo" value="" />' +
+      '</div>'+
+    '</div>' +
     '<button type="sumit">Save</button>'+
-  '</div>' +
+  '</div>' + 
   '<div class="toggle">Settings '+
     '<span class="open">open</span>'+
     '<span class="close" style="display:none;">close</span>'+
@@ -69,9 +89,9 @@ css({
 css({
   backgroundColor: '#eee',
   border: '1px solid #CCCCCC',
-  marginLeft: '-125px',
-  padding: '25px 50px',
-  width: '150px',
+  marginLeft: '-120px',
+  padding: '10px 10px',
+  width: '240px',
   MozBorderRadius: '0 0 0px 10px'
 }, content);
 
@@ -86,9 +106,16 @@ css({
   MozBorderRadius: '0 0 5px 5px'
 }, toggle);
 
-toggle.addEventListener('click', function(){
-  
-  console.log('arguments %o',arguments)
-}, false);
- 
+var labels = $s('#basecamp label');
+
+for (var i = labels.length-1; i >= 0; i--) {
+  css({display:'inline-block', width:'70px'},labels[i]);
+}
+
+
+
+// toggle.addEventListener('click', function(){
+//   console.log('arguments %o',arguments)
+// }, false);
+// 
 
