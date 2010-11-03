@@ -1,34 +1,41 @@
-// version 0.3 ALPHA!
+// version 0.3 BETA!
 // 2010-10-20
 // Copyright (c) 2010, Christian Angermann
 // Released under the GPL license
 // http://www.gnu.org/copyleft/gpl.html
 //
 // ==UserScript==
-// @name           Todo in progress highlighter
+// @name           Basecamp - Highlight todo in progress
 // @namespace      http://basecamphd.com
 // @description    Highlighted todos are in progress and added todo id before description
 // @include        https://*.basecamphq.com/projects/*/todo_lists/*
 // @include        http://*.basecamphq.com/projects/*/todo_lists/*
 // ==/UserScript==
 
+// helper/utilities
+var _ = {
+  $: function (selector) {
+    return document.querySelectorAll(selector);
+  },
+  
+  css: function (properties, elem) {
+    if (arguments.length < 2)
+      return false;
 
-
-//Element.prototype.setStyle = function (properties) {
-var setStyle = function (properties, elem) {
-  // if (typeof elem != 'undefined')
-  //   return false;
-    
-  for (var prop in properties) {
-    elem.style[prop] = properties[prop];
+    for (var prop in properties)
+      elem.style[prop] = properties[prop];
   }
+  
 };
+
+
+
 
 function mouseOverClosure (elem, item) {
   function handler (el) {
     el.addEventListener('mouseover', function () {
-      setStyle({display: 'block'}, item);
-      setStyle({zIndex: '1'}, (this === el ? elem : el).parentNode);
+      _.css({display: 'block'}, item);
+      _.css({zIndex: '1'}, (this === el ? elem : el).parentNode);
     }, false);
   }
   handler(elem, item);
@@ -37,15 +44,15 @@ function mouseOverClosure (elem, item) {
 function mouseOutClosure (elem, item) {
   function handler (el) {
     el.addEventListener('mouseout', function () {
-      setStyle({display: 'none'}, item);
-      setStyle({zIndex: '0'}, (this === el ? elem : el).parentNode);
+      _.css({display: 'none'}, item);
+      _.css({zIndex: '0'}, (this === el ? elem : el).parentNode);
     }, false);
   }
   handler(elem);
   handler(item);
 }
 
-var elems = document.querySelectorAll('.items_wrapper .item span[id^=item_wrap]');
+var elems = _.$('.items_wrapper .item span[id^=item_wrap]');
 
 for (var i = elems.length-1; i >= 0; i--) {
   var elem = elems[i],
@@ -56,7 +63,7 @@ for (var i = elems.length-1; i >= 0; i--) {
     parent = elem.parentNode;
 
   parent.appendChild(container);
-  setStyle({
+  _.css({
     position: 'absolute',
     display: 'none',
     backgroundColor: 'rgba(255,255,255,.9)',
@@ -73,29 +80,30 @@ for (var i = elems.length-1; i >= 0; i--) {
   }, container);
 
   // show todo id
-	container.innerHTML = '<span style="font-size:10px;color:#666;marginLeft:5px;padding:2px 4px 1px;"><strong>Task #</strong>' + id.substr(id.search(/[0-9]/), id.length) + '</span>';
+  container.innerHTML = '<span style="font-size:10px;color:#666;marginLeft:5px;padding:2px 4px 1px;"><strong>Task #</strong>' + id.substr(id.search(/[0-9]/), id.length) + '</span>';
 
   // highlighting
   if (/in progress/.test(string)) {
-
     if (/204/.test(elem.style.backgroundColor)) {
-      setStyle({
+      _.css({
         backgroundColor: '#A8CFA8',
         color: '#333'
       }, elem);
     } else {
-      setStyle({backgroundColor: '#D2E9D2'}, elem);
+      _.css({backgroundColor: '#D2E9D2'}, elem);
     }
-    setStyle({
-      MozBorderRadius: '1em',
-      WebkitBorderRadius: '1em',
-      padding: '0 .5em 1px .5em'
-    }, elem);
-
-    setStyle({
-      position:'relative'
-    }, parent);
   }
+  
+  _.css({
+    MozBorderRadius: '1em',
+    WebkitBorderRadius: '1em',
+    padding: '0 .5em 1px .5em'
+  }, elem);
+
+  _.css({
+    position:'relative'
+  }, parent);
+  
   mouseOverClosure(elem, container);
   mouseOutClosure(elem, container);
 }

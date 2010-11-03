@@ -14,18 +14,26 @@
 // @include        http://*.github.com/*
 // ==/UserScript==
 
-var commits = document.getElementById('commit');
-var $s = document.querySelectorAll;
+// helper/utilities
+var _ = {
+  $: function (selector) {
+    return document.querySelectorAll(selector);
+  },
+  
+  css: function (properties, elem) {
+    if (arguments.length < 2)
+      return false;
 
-var css = function (properties, elem) {
-   if (arguments.length > 2)
-    return;
-    
-  for (var prop in properties) {
-    elem.style[prop] = properties[prop];
+    for (var prop in properties)
+      elem.style[prop] = properties[prop];
   }
+  
 };
 
+
+
+
+var commits = document.getElementById('commit');
 var messages = $s('#commit .message a'),
   prefix = 'qc-',
   key = '\\d{8}',
