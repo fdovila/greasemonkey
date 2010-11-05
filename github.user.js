@@ -30,12 +30,10 @@ var update = function() {
     account = localStorage.getItem('gm_account'),
     pattern = new RegExp(prefix + key + suffix, 'ig');
 
-
   for (var i = messages.length-1; i >= 0; i--) {
     var elem = messages[i],
       txt = elem.innerHTML,
       basecamp_url = 'https://'+account+'.basecamphq.com/todo_items/';
-      console.log('pr '+prefix+' su '+suffix+' acc '+account);
     if (txt.match(pattern)) {
       var id = txt.match(pattern)[0];
 
