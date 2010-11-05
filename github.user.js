@@ -37,7 +37,7 @@ var update = function() {
     if (txt.match(pattern)) {
       var id = txt.match(pattern)[0];
 
-      elem.parentNode.innerHTML = '<a target="_blank" style="color:#4183C4;" href="' + (basecamp_url + id.match(/\d{8}/)[0]) + '">' + id + '</a>' +
+      elem.parentNode.innerHTML = '<a target="_blank" style="color:#4183C4;" href="' + (basecamp_url + id.match(/\d{8}/)[0]) + '/comments">' + id + '</a>' +
         '<a href="' + elem.href + '">' + txt.replace(pattern, '') + '</a>';
     }
   }
