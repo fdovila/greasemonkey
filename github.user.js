@@ -1,79 +1,79 @@
-  // version 1.0
-  // 2010-11-07
-  // Copyright (c) 2010, Christian Angermann
-  // Released under the GPL license
-  // http://www.gnu.org/copyleft/gpl.html
-  //
-  // ==UserScript==
-  // @name           Github - Show commit dependence to basecamp task
-  // @namespace      http://*.github.com
-  // @description    Adds when task number is available, a link to the task in http://basecamphd.com Todo list added to commit message.
-  // @include        https://*.github.com/*
-  // @include        http://*.github.com/*
-  // @exclude        http://*.github.com/*/*/raw/*
-  // @exclude        https://*.github.com/*/*/raw/*
-  // ==/UserScript==
+// version 1.0
+// 2010-11-07
+// Copyright (c) 2010, Christian Angermann
+// Released under the GPL license
+// http://www.gnu.org/copyleft/gpl.html
+//
+// ==UserScript==
+// @name           Github - Show commit dependence to basecamp task
+// @namespace      http://*.github.com
+// @description    Adds when task number is available, a link to the task in http://basecamphd.com Todo list added to commit message.
+// @include        https://*.github.com/*
+// @include        http://*.github.com/*
+// @exclude        http://*.github.com/*/*/raw/*
+// @exclude        https://*.github.com/*/*/raw/*
+// ==/UserScript==
 
-  // helper/utilities
-  var dom = function (selector) {
-    return document.querySelectorAll(selector);
+// helper/utilities
+var dom = function (selector) {
+  return document.querySelectorAll(selector);
+};
+
+var get_data = function () {
+  return {
+    prefix: localStorage.getItem('gm_prefix') || '',
+    suffix: localStorage.getItem('gm_suffix') || '',
+    key: localStorage.getItem('gm_key') || '',
+    account: localStorage.getItem('gm_account') || ''
   };
+};
 
-  var get_data = function () {
-    return {
-      prefix: localStorage.getItem('gm_prefix') || '',
-      suffix: localStorage.getItem('gm_suffix') || '',
-      key: localStorage.getItem('gm_key') || '',
-      account: localStorage.getItem('gm_account') || ''
-    };
-  };
-
-  //
-  // ======================= update commit message =============================
-  //
-  var update = function () {
-    var messages = dom('#commit .message a'),
-      messages = messages.length > 0 ? messages : dom('#commit .message pre')
-      data = get_data(),
-      key = '\\d{8}',
-      pattern = new RegExp(data.prefix + key + data.suffix, 'ig');
-      
-    for (var i = messages.length-1; i >= 0; i--) {
-      var elem = messages[i],
-        basecamp_url = 'https://' + data.account +'.basecamphq.com/todo_items/',
-        parent = !!elem.parentNode && elem.parentNode, 
-        txt = '';
-        
-      if (parent) {
-        if (parent.getAttribute('data-origin') == null) {
-          parent.setAttribute('data-origin', parent.innerHTML);
-        } else {
-          parent.innerHTML = parent.getAttribute('data-origin');
-        }
-        txt = parent.firstChild.innerHTML;
-      }
-     
-      if (txt.match(pattern)) {
-        var id = txt.match(pattern)[0],
-        raw_id = id.match(/\d{8}/)[0],
-        raw_message = txt.replace(pattern, ''),
-        tooltip = '';
-        
-        if (data.key != '') {
-          tooltip = '<span class="task">' +
-            '<span></span>' +
-            '<strong class="userbox" id="gm_task_' + raw_id + '">&nbsp;</strong>' +
-          '</span>';
-          task_description_request(raw_id);
-        }
-        
-        parent.innerHTML = (elem.href ? '' : '<pre>') + 
-          '<a target="_blank" style="color:#4183C4;" href="' + basecamp_url + raw_id + '/comments">' + id + tooltip + '</a>' +
-          (elem.href ? '<a href="' + elem.href + '">' + raw_message + '</a>' : raw_message + '</pre>');
-      }
-    }
+//
+// ======================= update commit message =============================
+//
+var update = function () {
+  var messages = dom('#commit .message a'),
+    messages = messages.length > 0 ? messages : dom('#commit .message pre')
+    data = get_data(),
+    key = '\\d{8}',
+    pattern = new RegExp(data.prefix + key + data.suffix, 'ig');
     
-  };
+  for (var i = messages.length-1; i >= 0; i--) {
+    var elem = messages[i],
+      basecamp_url = 'https://' + data.account +'.basecamphq.com/todo_items/',
+      parent = !!elem.parentNode && elem.parentNode, 
+      txt = '';
+      
+    if (parent) {
+      if (parent.getAttribute('data-origin') == null) {
+        parent.setAttribute('data-origin', parent.innerHTML);
+      } else {
+        parent.innerHTML = parent.getAttribute('data-origin');
+      }
+      txt = parent.firstChild.innerHTML;
+    }
+   
+    if (txt.match(pattern)) {
+      var id = txt.match(pattern)[0],
+      raw_id = id.match(/\d{8}/)[0],
+      raw_message = txt.replace(pattern, ''),
+      tooltip = '';
+      
+      if (data.key != '') {
+        tooltip = '<span class="task">' +
+          '<span></span>' +
+          '<strong class="userbox" id="gm_task_' + raw_id + '">&nbsp;</strong>' +
+        '</span>';
+        task_description_request(raw_id);
+      }
+      
+      parent.innerHTML = (elem.href ? '' : '<pre>') + 
+        '<a target="_blank" style="color:#4183C4;" href="' + basecamp_url + raw_id + '/comments">' + id + tooltip + '</a>' +
+        (elem.href ? '<a href="' + elem.href + '">' + raw_message + '</a>' : raw_message + '</pre>');
+    }
+  }
+  
+};
 
 var task_description_request = function (id) {
   var data = get_data(),
