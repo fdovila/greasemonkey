@@ -1,5 +1,5 @@
-// version 0.5 BETA!
-// 2010-10-20
+// version 1.0
+// 2010-11-07
 // Copyright (c) 2010, Christian Angermann
 // Released under the GPL license
 // http://www.gnu.org/copyleft/gpl.html
@@ -33,6 +33,7 @@ var get_data = function() {
 //
 var update = function() {
   var messages = dom('#commit .message a'),
+    messages = messages.length > 0 ? messages : dom('#commit .message pre')
     data = get_data(),
     key = '\\d{8}',
     pattern = new RegExp(data.prefix + key + data.suffix, 'ig');
@@ -42,13 +43,51 @@ var update = function() {
       txt = elem.innerHTML,
       basecamp_url = 'https://' + data.account +'.basecamphq.com/todo_items/';
     if (txt.match(pattern)) {
-      var id = txt.match(pattern)[0];
-
-      elem.parentNode.innerHTML = '<a target="_blank" style="color:#4183C4;" href="' + (basecamp_url + id.match(/\d{8}/)[0]) + '/comments">' + id + '</a>' +
-        '<a href="' + elem.href + '">' + txt.replace(pattern, '') + '</a>';
+      var id = txt.match(pattern)[0],
+      raw_id = id.match(/\d{8}/)[0],
+      raw_message = txt.replace(pattern, '');
+      task_request(raw_id);
+      elem.parentNode.innerHTML = (elem.href || '<pre>') + 
+        '<a target="_blank" style="color:#4183C4;" href="' + basecamp_url + raw_id + '/comments">' + 
+          id + 
+          '<span class="task">' +
+            '<span></span>' +
+            '<strong class="userbox" id="gm_task_' + raw_id + '">&nbsp;</strong>' +
+          '</span>' +
+        '</a>' +
+        (elem.href ? '<a href="' + elem.href + '">' + raw_message + '</a>' : raw_message + '</pre>');
     }
   }
+  
 };
+
+var task_request = function (id) {
+  var data = get_data(),
+    basecamp_url = 'https://' + data.account +'.basecamphq.com/todo_items/' + id;
+
+  GM_xmlhttpRequest({
+    method: "GET",
+    url: basecamp_url,
+    data: 'username=' + data.key + '&password=x',
+    headers: {
+      "User-Agent": "Mozilla/5.0",
+      "Accept": "text/xml"
+    },
+    onload: function(response) {
+      // Inject responseXML into existing Object if not present
+      if (!response.responseXML) {
+        response.responseXML = new DOMParser()
+          .parseFromString(response.responseText, "text/xml");
+      }
+      var task_message = response.responseXML.getElementsByTagName('content')[0].firstChild.nodeValue
+      //GM_log('XML: ' + response.responseXML);
+      GM_log('TODO: ' + task_message);
+      document.getElementById('gm_task_' + id).innerHTML = task_message;
+    }
+    
+  });
+};
+
 var timeout_id = 0;
 var show_complete_label = function () {
   var style = dom('#gm_basecamp .action > span')[0].style;
@@ -67,7 +106,7 @@ var data = get_data(),
 
 form.id = 'gm_basecamp';
 form.innerHTML = '<div class="content userbox">' +
-    '<div class="add-pill-form first">' +
+    '<div class="add-pill-form">' +
       '<h3>github</h3>' +
       '<dl>' +
         '<dt><label for="gm_prefix">Prefix</label></dt>'+
@@ -102,26 +141,33 @@ form.innerHTML = '<div class="content userbox">' +
   '</a>';
 document.body.appendChild(form);
 
-var css_form = "#gm_basecamp {position:absolute;right:1em;top:0;z-index:3}";
-css_form += "#gm_basecamp .add-pill-form{width: 250px}";
-css_form += "#gm_basecamp small{color: #777}";
-css_form += "#gm_basecamp .add-pill-form.first{width: 100px;margin-right:5px;}";
-css_form += "#gm_basecamp .add-pill-form input[type=text]{width: 100%;}";
-css_form += "#gm_basecamp .add-pill-form dl{padding-right:12px}";
-css_form += "#gm_basecamp .content {float:none;padding:0 10px 10px;-moz-border-radius-bottomright:0;-webkit-border-radius-bottom-right:0}";
-css_form += "#gm_basecamp .content > div{display:inline-block;}";
-css_form += "#gm_basecamp .content .action{display:block;text-align:right;position:relative}";
-css_form += "#gm_basecamp .content .action a{height:24px}";
-css_form += "#gm_basecamp .content .action a span{height:24px;line-height:26px;}";
-css_form += "#gm_basecamp .content .action > span{line-height:26px;position: absolute;right:70px;color:#70C765;visibility:hidden}";
-css_form += "#gm_basecamp h3{margin:0 0 .2em}";
-css_form += "#gm_basecamp .toggle {background: #ECECEC; margin-top:-1px; padding:5px 8px 0;}";
-css_form += "#gm_basecamp.collapsed .content{display:none;}";
-css_form += "#gm_basecamp.collapsed .open{display:none;}";
-css_form += "#gm_basecamp.collapsed .close{display:inline}";
-css_form += "#gm_basecamp .close{display:none}";
-GM_addStyle(css_form);
-
+var styles = "#gm_basecamp {position:absolute;right:1em;top:0;z-index:3}";
+styles += "#gm_basecamp .add-pill-form{width:330px}";
+styles += "#gm_basecamp small{color:#777}";
+styles += "#gm_basecamp .add-pill-form:first-child{width:70px;margin-right:5px}";
+styles += "#gm_basecamp .add-pill-form input[type=text]{width: 100%}";
+styles += "#gm_basecamp .add-pill-form dl{padding-right:12px}";
+styles += "#gm_basecamp .content {float:none;padding:0 10px 10px;-moz-border-radius-bottomright:0;-webkit-border-radius-bottom-right:0}";
+styles += "#gm_basecamp .content > div{display:inline-block}";
+styles += "#gm_basecamp .content .action{display:block;text-align:right;position:relative}";
+styles += "#gm_basecamp .content .action a{height:24px}";
+styles += "#gm_basecamp .content .action a span{height:24px;line-height:26px}";
+styles += "#gm_basecamp .content .action > span{line-height:26px;position: absolute;right:70px;color:#70C765;visibility:hidden}";
+styles += "#gm_basecamp h3{margin:0 0 .2em}";
+styles += "#gm_basecamp .toggle {background: #ECECEC; margin-top:-1px; padding:5px 8px 0}";
+styles += "#gm_basecamp.collapsed .content{display:none}";
+styles += "#gm_basecamp.collapsed .open{display:none}";
+styles += "#gm_basecamp.collapsed .close{display:inline}";
+styles += "#gm_basecamp .close{display:none}";
+styles += ".commit .message pre{position:relative}";
+styles += ".commit .message .task {display:none;position:absolute;top:15px;left:0; color:#777}";
+styles += ".commit .message .task span{border:10px solid transparent;height:0;line-height:0;width: 0;border-bottom-color:#FCFCFC;margin-top:-10px;margin-left:25px;display:block}";
+styles += ".commit .message .userbox {-moz-border-radius:5px;-webkit-border-radius:5px;font-weight:normal}";
+styles += ".commit .message a:hover .task{display:block}";
+GM_addStyle(styles);
+//
+// ================================ events ===================================
+//
 dom('#gm_basecamp .toggle')[0].addEventListener('click', function(event){
   event.preventDefault();
   event.stopPropagation();
@@ -136,20 +182,21 @@ dom('#gm_basecamp .toggle')[0].addEventListener('click', function(event){
   localStorage.setItem('panel', classNames);
 }, false);
 
-if (localStorage.getItem('panel') == 'collapsed') {
-  form.setAttribute('class', 'collapsed');
-}
-
 dom('#gm_basecamp .submit')[0].addEventListener('click', function(event){
   event.preventDefault();
   event.stopPropagation();
   event.stopped = true;
   show_complete_label();
-  
-  var inputs = dom('#gm_basecamp .form input[type=text]');
+
+  var inputs = dom('#gm_basecamp input[type=text]');
   for (var i = inputs.length-1; i >= 0; i--) {
     localStorage.setItem(inputs[i].id, inputs[i].value);
   }
   update();
 }, false);
 update();
+
+// initial
+if (localStorage.getItem('panel') == 'collapsed') {
+  form.setAttribute('class', 'collapsed');
+}
