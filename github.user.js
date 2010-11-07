@@ -5,9 +5,9 @@
 // http://www.gnu.org/copyleft/gpl.html
 //
 // ==UserScript==
-// @name           Github - Show commit dependence to basecamp task
+// @name           Github - Show task description to commit message
 // @namespace      http://*.github.com
-// @description    Adds when task number is available, a link to the task in http://basecamphd.com Todo list added to commit message.
+// @description    Shows the relationship between commit to Basecamp todo task. The identifier number of basecamphd.com todo have to be specified in the git-commit messages todo. Example: "74236587: Added some specials" 
 // @include        https://*.github.com/*
 // @include        http://*.github.com/*
 // @exclude        http://*.github.com/*/*/raw/*
