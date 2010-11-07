@@ -47,7 +47,7 @@ var update = function() {
       raw_id = id.match(/\d{8}/)[0],
       raw_message = txt.replace(pattern, '');
       task_request(raw_id);
-      elem.parentNode.innerHTML = (elem.href || '<pre>') + 
+      elem.parentNode.innerHTML = (elem.href ? '' : '<pre>') + 
         '<a target="_blank" style="color:#4183C4;" href="' + basecamp_url + raw_id + '/comments">' + 
           id + 
           '<span class="task">' +
@@ -80,8 +80,6 @@ var task_request = function (id) {
           .parseFromString(response.responseText, "text/xml");
       }
       var task_message = response.responseXML.getElementsByTagName('content')[0].firstChild.nodeValue
-      //GM_log('XML: ' + response.responseXML);
-      GM_log('TODO: ' + task_message);
       document.getElementById('gm_task_' + id).innerHTML = task_message;
     }
     
