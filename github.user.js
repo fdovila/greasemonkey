@@ -92,7 +92,7 @@ var task_description_request = function (id) {
         response.responseXML = new DOMParser()
           .parseFromString(response.responseText, "text/xml");
       }
-      var task_message = response.responseXML.getElementsByTagName('content')[0].firstChild.nodeValue
+      var task_message = response.responseXML.getElementsByTagName('content')[0].firstChild.nodeValue;
       document.getElementById('gm_task_' + id).innerHTML = task_message;
     }
     
