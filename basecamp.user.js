@@ -1,5 +1,5 @@
-// version 0.3 BETA!
-// 2010-10-20
+// version 0.4 BETA!
+// 2010-11-09
 // Copyright (c) 2010, Christian Angermann
 // Released under the GPL license
 // http://www.gnu.org/copyleft/gpl.html
@@ -13,97 +13,44 @@
 // ==/UserScript==
 
 // helper/utilities
-var _ = {
-  $: function (selector) {
-    return document.querySelectorAll(selector);
-  },
-  
-  css: function (properties, elem) {
-    if (arguments.length < 2)
-      return false;
-
-    for (var prop in properties)
-      elem.style[prop] = properties[prop];
-  }
-  
+var dom =  function (selector) {
+  return document.querySelectorAll(selector);
 };
 
-
-
-
-function mouseOverClosure (elem, item) {
-  function handler (el) {
-    el.addEventListener('mouseover', function () {
-      _.css({display: 'block'}, item);
-      _.css({zIndex: '1'}, (this === el ? elem : el).parentNode);
-    }, false);
-  }
-  handler(elem, item);
-  handler(item, item);
-}
-function mouseOutClosure (elem, item) {
-  function handler (el) {
-    el.addEventListener('mouseout', function () {
-      _.css({display: 'none'}, item);
-      _.css({zIndex: '0'}, (this === el ? elem : el).parentNode);
-    }, false);
-  }
-  handler(elem);
-  handler(item);
-}
-
-var elems = _.$('.items_wrapper .item span[id^=item_wrap]');
+var elems = dom('.items_wrapper .item span[id^=item_wrap]');
 
 for (var i = elems.length-1; i >= 0; i--) {
   var elem = elems[i],
     string = elem.innerHTML,
-    container = document.createElement('div'),
+    box = document.createElement('div'),
     link = document.createElement('a'),
     id = elem.id,
     parent = elem.parentNode;
 
-  parent.appendChild(container);
-  _.css({
-    position: 'absolute',
-    display: 'none',
-    backgroundColor: 'rgba(255,255,255,.9)',
-    border: '1px solid #AAA',
-    left: '-3px',
-    top: '-3px',
-    padding: '18px 0 0',
-    width: '100%',
-    zIndex: '-1',
-    MozBorderRadius: '7px 7px 3px 3px',
-    WebkitBorderRadius: '7px 7px 3px 3px',
-    MozBoxShadow: '0 2px 5px rgba(0,0,0,.5)',
-    WebkitBoxShadow: '0 2px 5px rgba(0,0,0,.5)'
-  }, container);
+  box.setAttribute('class', 'gm_box');
+  parent.appendChild(box);
 
   // show todo id
-  container.innerHTML = '<span style="font-size:10px;color:#666;marginLeft:5px;padding:2px 4px 1px;"><strong>Task #</strong>' + id.substr(id.search(/[0-9]/), id.length) + '</span>';
+  box.innerHTML = '<span class="gm_task"><strong>Task #</strong>' + id.substr(id.search(/[0-9]/), id.length) + '</span>';
 
   // highlighting
   if (/in progress/.test(string)) {
     if (/204/.test(elem.style.backgroundColor)) {
-      _.css({
-        backgroundColor: '#A8CFA8',
-        color: '#333'
-      }, elem);
+      elem.setAttribute('data-gm-owner', 'true');
     } else {
-      _.css({backgroundColor: '#D2E9D2'}, elem);
+      elem.setAttribute('data-gm-owner', 'false');
     }
   }
-  
-  _.css({
-    MozBorderRadius: '1em',
-    WebkitBorderRadius: '1em',
-    padding: '0 .5em 1px .5em'
-  }, elem);
-
-  _.css({
-    position:'relative'
-  }, parent);
-  
-  mouseOverClosure(elem, container);
-  mouseOutClosure(elem, container);
 }
+
+var styles = '.gm_box{position:absolute;display:none;background-color:rgba(255,255,255,.9);border:1px solid #AAA;left:-3px;top:-3px;padding:18px 0 0;width:100%;z-zndex:-1;-moz-border-radius:7px 7px 3px 3px;-webkit-border-radius:7px 7px 3px 3px;-moz-box-shadow:0 2px 5px rgba(0,0,0,.5);-webkit-box-shadow:0 2px 5px rgba(0,0,0,.5);z-index:-1;}';
+styles += '[data-gm-owner]{position:relative;z-index:0;-moz-border-radius:1em;-webkit-border-radius:1em;padding:0 .5em 1px .5em}';
+styles += '.gm_box .gm_task{font-size:10px;color:#666;marginLeft:5px;padding:2px 4px 1px;}';
+styles += '[data-gm-owner=true]{background-color:#A8CFA8;color:#333}';
+styles += '[data-gm-owner=false]{background-color:#D2E9D2}';
+styles += '.item_wrapper{z-index:0;}';
+styles += '.item_wrapper:hover{z-index:1;}';
+styles += '[id^=item_]:hover .gm_box{display:block;}';
+styles += 'body.todos div.list a.pill_todo_item span.content{background-image:none;}';
+
+GM_addStyle(styles);
