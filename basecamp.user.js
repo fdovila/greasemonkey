@@ -5,11 +5,11 @@
 // http://www.gnu.org/copyleft/gpl.html
 //
 // ==UserScript==
-// @name   Basecamp - Highlight todo in progress
-// @namespace  http://basecamphd.com
-// @descriptionHighlighted todos are in progress and added todo id before description
-// @includehttps://*.basecamphq.com/projects/*/todo_lists/*
-// @includehttp://*.basecamphq.com/projects/*/todo_lists/*
+// @name        Basecamp - Highlight todo in progress
+// @namespace   http://basecamphd.com
+// @description Highlighted todos are in progress and added todo id before description
+// @include     https://*.basecamphq.com/projects/*/todo_lists/*
+// @include     http://*.basecamphq.com/projects/*/todo_lists/*
 // ==/UserScript==
 
 // helper/utilities
@@ -94,6 +94,10 @@ var init = function () {
   }
 };
 
+var roundNumber =  function (num, dec) {
+	var result = Math.round(num*Math.pow(10,dec))/Math.pow(10,dec);
+	return result;
+};
 
 var update_progress_bar = function (id) {
   var spent_time = localStorage.getItem('spent_time_' + id),
@@ -121,7 +125,7 @@ var update_progress_bar = function (id) {
   
   GM_addStyle('#item_' + id + ' .gm_progress span{border-left-width:' + (left*factor) + 'px;border-left-color:' + left_color + 'border-right-width:' + (right*factor) + 'px;border-right-color:' + right_color + '}');
   var time = dom('#item_' + id + ' .gm_progress strong')[0];
-  time.innerHTML = 'Spent: ' + spent_time + 'h / Estimated: ' + estimate_time + 'h';
+  time.innerHTML = 'Spent: ' + roundNumber(spent_time, 2) + 'h / Estimated: ' + roundNumber(estimate_time, 2) + 'h';
 };
 
 
