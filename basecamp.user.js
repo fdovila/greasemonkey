@@ -54,7 +54,7 @@ var init = function () {
         elem.addEventListener('mouseover', function () { 
           var url = loc.protocol + '/todo_items/' + id + '/time_entries.xml';  
          
-          if (localStorage.getItem('spent_time_' + id) == null) {
+          // if (localStorage.getItem('spent_time_' + id) == null) {
             get_request(url, id, function (xhr) {
               var hours = xhr.responseXML.getElementsByTagName('hours'),
                 spent_time = 0;
@@ -67,9 +67,9 @@ var init = function () {
               localStorage.setItem('estimate_time_' + id, parseFloat(estimate_time, 10));
               update_progress_bar(id);
             });
-          } else {
-            update_progress_bar(id);
-          }
+          // } else {
+          //   update_progress_bar(id);
+          // }
         }, false);   
       }
     })(elem, desc_elem);
