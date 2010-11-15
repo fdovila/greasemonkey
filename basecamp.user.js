@@ -16,6 +16,7 @@
 var dom =  function (selector) {
   return document.querySelectorAll(selector);
 };
+
 var get_data = function () {
   return {
     prefix: localStorage.getItem('gm_indicator') || '',
@@ -26,7 +27,6 @@ var get_data = function () {
 
 var elems = dom('.items_wrapper > div > div[id^=item_]');
 var init = function () {
-console.log('init')
   for (var i = elems.length-1; i >= 0; i--) {
     var elem = elems[i],
       string = elem.innerHTML,
@@ -79,7 +79,6 @@ console.log('init')
     var description = desc_elem.innerHTML;
     
     if (/story/i.test(description)) {
-      alert(description)
       elem.setAttribute('class', elem.getAttribute('class') + ' gm_user_story');
     }
     
@@ -103,12 +102,12 @@ var update_progress_bar = function (id) {
     left = percent,
     right = 100 - percent,
     green = '#99BF85;',
-    green_dark = '#317D31;'
+    green_dark = '#317D31;',
     blue = '#8CB2D4;',
     red = '#C83131;',
     orange = '#BF783D;',
     yellow = '#C8C831;',
-    left_color = percent < 50 ? green : green_dark;
+    left_color = percent < 50 ? green : green_dark,
     right_color = percent < 50 ? blue : orange,
     factor = 2;
     
@@ -123,7 +122,7 @@ var update_progress_bar = function (id) {
   GM_addStyle('#item_' + id + ' .gm_progress span{border-left-width:' + (left*factor) + 'px;border-left-color:' + left_color + 'border-right-width:' + (right*factor) + 'px;border-right-color:' + right_color + '}');
   var time = dom('#item_' + id + ' .gm_progress strong')[0];
   time.innerHTML = 'Spent: ' + spent_time + 'h / Estimated: ' + estimate_time + 'h';
-}
+};
 
 
 var get_request = function (url, id, callback) {
@@ -174,7 +173,7 @@ styles += '.item_wrapper>div>.content:hover{border-bottom: solid 1px transparent
 styles += '.item_wrapper>div>.content>span{z-index:0}';
 styles += '.gm_progress{display: inline-block;height: 13px;overflow: hidden;position:relative;margin-bottom: -2px;}';
 styles += '.gm_progress span{border:0 solid transparent;}';
-styles += '.gm_progress strong{color: #FFF;display: block;font-size: 9px;font-weight: normal;height: auto;line-height: 100%;position: absolute;text-align: center;width: 200px;top:2px;text-shadow:0 0 1px #000;}'
+styles += '.gm_progress strong{color: #FFF;display: block;font-size: 9px;font-weight: normal;height: auto;line-height: 100%;position: absolute;text-align: center;width: 200px;top:2px;text-shadow:0 0 1px #000;}';
 styles += '.item_wrapper:hover{z-index:1;}';
 styles += '[id^=item_]:hover .gm_box{display:block;}';
 styles += 'body.todos div.list a.pill_todo_item,body.todos div.list a.pill_todo_item span.content{background-image:none;}';
@@ -200,9 +199,10 @@ panel.innerHTML = '' +
     '</div>' +
   '</div>' +   
   '<div class="action">' + 
-    '<button type="submit">submit</button>'
+    '<button type="submit">submit</button>' +
   '</div>'
 ;
+
 //document.body.appendChild(panel);
 var style =  '#gm_panel{-moz-box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2) inset, -1px -1px 0 rgba(200,200,200,.2) inset;-moz-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px;color:#fff;background-color: rgba(200, 200, 200, 0.4);font-size: 10px;padding: 3px 1em;position: absolute;right: 20%;text-align: left;top: 4px;}';
 style += '#gm_panel label{display: inline-block;padding-right: 10px;}';
