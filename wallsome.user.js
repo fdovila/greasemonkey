@@ -9,6 +9,12 @@
 // @include        http://*.wallsome.com/*/projects/*/milestones/*
 // ==/UserScript==
 
-var items = document.querySelectorAll('.responsible_for_item');
-for (var i = items.length-1; i >= 0; i--)
-  items[i].style.backgroundColor = '#A6FF44';
+GM_addStyle('.responsible_for_item{background-color: #A6FF44;}');
+  
+var items = document.querySelectorAll('.todo_item');
+for (var i = items.length-1; i >= 0; i--) {
+  var item = items[i];
+  if (/story/i.test(item.innerHTML))
+    item.style.backgroundColor = '#dcdcdc';
+}
+  

@@ -170,7 +170,7 @@ styles += '[data-gm-owner]{position:relative;z-index:0;padding:0 3px 1px;backgro
 styles += '.gm_box .gm_task{font-size:10px;color:#666;marginLeft:5px;padding:2px 4px 1px;}';
 styles += '[data-gm-owner=true]{background-color:#A8CFA8!important;color:#333;background-image:-moz-linear-gradient(left,#A8CFA8 90%,#eee)!important;}';
 styles += '[data-gm-owner=false]{background-color:#D2E9D2;background-image:-moz-linear-gradient(left,#D2E9D2 90%,#eee)!important;}';
-styles += '.gm_user_story{background-color: #F6F6F6 !important;border-top: 1px solid #CCC;margin-top: -4px;padding-top: 3px;}';
+styles += '.gm_user_story{background-color: #EDF3FE !important;border-top: 1px solid #CCC;margin-top: -4px;padding-top: 3px;}';
 styles += '.item_wrapper{z-index:0;}';
 styles += '.item_wrapper>div>.content{border-bottom: solid 1px #eee; padding:4px 0}';
 styles += '.item_wrapper>div>.content:hover{border-bottom: solid 1px transparent;}';
