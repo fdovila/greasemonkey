@@ -1,5 +1,5 @@
-// version 1.0
-// 2010-11-07
+// version 1.1
+// 2010-11-26
 // Copyright (c) 2010, Christian Angermann
 // Released under the GPL license
 // http://www.gnu.org/copyleft/gpl.html
@@ -27,6 +27,11 @@ var get_data = function () {
     account: localStorage.getItem('gm_account') || ''
   };
 };
+
+var AUTH_KEY = '';
+
+var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(c){var a="";var k,h,f,j,g,e,d;var b=0;c=Base64._utf8_encode(c);while(b<c.length){k=c.charCodeAt(b++);h=c.charCodeAt(b++);f=c.charCodeAt(b++);j=k>>2;g=((k&3)<<4)|(h>>4);e=((h&15)<<2)|(f>>6);d=f&63;if(isNaN(h)){e=d=64}else{if(isNaN(f)){d=64}}a=a+this._keyStr.charAt(j)+this._keyStr.charAt(g)+this._keyStr.charAt(e)+this._keyStr.charAt(d)}return a},decode:function(c){var a="";var k,h,f;var j,g,e,d;var b=0;c=c.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(b<c.length){j=this._keyStr.indexOf(c.charAt(b++));g=this._keyStr.indexOf(c.charAt(b++));e=this._keyStr.indexOf(c.charAt(b++));d=this._keyStr.indexOf(c.charAt(b++));k=(j<<2)|(g>>4);h=((g&15)<<4)|(e>>2);f=((e&3)<<6)|d;a=a+String.fromCharCode(k);if(e!=64){a=a+String.fromCharCode(h)}if(d!=64){a=a+String.fromCharCode(f)}}a=Base64._utf8_decode(a);return a},_utf8_encode:function(b){b=b.replace(/\r\n/g,"\n");var a="";for(var e=0;e<b.length;e++){var d=b.charCodeAt(e);if(d<128){a+=String.fromCharCode(d)}else{if((d>127)&&(d<2048)){a+=String.fromCharCode((d>>6)|192);a+=String.fromCharCode((d&63)|128)}else{a+=String.fromCharCode((d>>12)|224);a+=String.fromCharCode(((d>>6)&63)|128);a+=String.fromCharCode((d&63)|128)}}}return a},_utf8_decode:function(a){var b="";var d=0;var e=c1=c2=0;while(d<a.length){e=a.charCodeAt(d);if(e<128){b+=String.fromCharCode(e);d++}else{if((e>191)&&(e<224)){c2=a.charCodeAt(d+1);b+=String.fromCharCode(((e&31)<<6)|(c2&63));d+=2}else{c2=a.charCodeAt(d+1);c3=a.charCodeAt(d+2);b+=String.fromCharCode(((e&15)<<12)|((c2&63)<<6)|(c3&63));d+=3}}}return b}};
+
 
 //
 // ======================= update commit message =============================
@@ -64,7 +69,9 @@ var update = function () {
           '<span></span>' +
           '<strong class="userbox" id="gm_task_' + raw_id + '">&nbsp;</strong>' +
         '</span>';
-        task_description_request(raw_id);
+        http_request('https://' + data.account +'.basecamphq.com/todo_items/' + raw_id, function(response) {
+          document.getElementById('gm_task_' + raw_id).innerHTML = response.responseXML.getElementsByTagName('content')[0].firstChild.nodeValue;
+        });
       }
       
       parent.innerHTML = (elem.href ? '' : '<pre>') + 
@@ -74,29 +81,28 @@ var update = function () {
   }
   
 };
+var http_request = function (url, callback) {
+  var data = get_data();
 
-var task_description_request = function (id) {
-  var data = get_data(),
-    basecamp_url = 'https://' + data.account +'.basecamphq.com/todo_items/' + id;
+  if(AUTH_KEY == ''){
+    AUTH_KEY = Base64.encode(data.key + ":x");
+  }
+  
   GM_xmlhttpRequest({
     method: "GET",
-    url: basecamp_url,
-    data: 'username=' + data.key + '&password=x',
+    url: url,
     headers: {
-      "User-Agent": "Mozilla/5.0",
-      "Accept": "application/xml",
-      "Content-Type": "application/xml",
-      "Authorization": "Basic " + data.key
+      'User-agent': 'Mozilla/4.0 (compatible) Greasemonkey/0.3',
+      'Accept': 'application/atom+xml,application/xml,text/xml',
+      "Authorization": "Basic " + AUTH_KEY
     },
     onload: function (response) {
       if (!response.responseXML) {
         response.responseXML = new DOMParser()
           .parseFromString(response.responseText, "text/xml");
       }
-      var task_message = response.responseXML.getElementsByTagName('content')[0].firstChild.nodeValue;
-      document.getElementById('gm_task_' + id).innerHTML = task_message;
+      callback.call(this, response);
     }
-    
   });
 };
 
