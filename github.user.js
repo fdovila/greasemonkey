@@ -78,14 +78,15 @@ var update = function () {
 var task_description_request = function (id) {
   var data = get_data(),
     basecamp_url = 'https://' + data.account +'.basecamphq.com/todo_items/' + id;
-    
   GM_xmlhttpRequest({
     method: "GET",
     url: basecamp_url,
     data: 'username=' + data.key + '&password=x',
     headers: {
       "User-Agent": "Mozilla/5.0",
-      "Accept": "text/xml"
+      "Accept": "application/xml",
+      "Content-Type": "application/xml",
+      "Authorization": "Basic " + data.key
     },
     onload: function (response) {
       if (!response.responseXML) {
