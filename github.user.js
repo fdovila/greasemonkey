@@ -33,13 +33,13 @@ var get_data = function () {
 //
 var update = function () {
   var messages = dom('#commit .message a'),
-    messages = messages.length > 0 ? messages : dom('#commit .message pre')
+    messages = messages.length > 0 ? messages : dom('#commit .message pre'),
     data = get_data(),
     key = '\\d{8}',
     pattern = new RegExp(data.prefix + key + data.suffix, 'ig');
     
-  for (var i = messages.length-1; i >= 0; i--) {
-    var elem = messages[i],
+  for (var d = messages.length-1; d >= 0; d--) {
+    var elem = messages[d],
       basecamp_url = 'https://' + data.account +'.basecamphq.com/todo_items/',
       parent = !!elem.parentNode && elem.parentNode, 
       txt = '';
@@ -158,7 +158,7 @@ styles += "#gm_basecamp .add-pill-form{width:330px}";
 styles += "#gm_basecamp small{color:#777}";
 styles += "#gm_basecamp .add-pill-form:first-child{width:70px;margin-right:5px}";
 styles += "#gm_basecamp .add-pill-form input[type=text]{width: 100%}";
-styles += "#gm_basecamp .add-pill-form dl{padding-right:12px}";
+styles += "#gm_basecamp .add-pill-form dl{padding-right:16px}";
 styles += "#gm_basecamp .content {float:none;padding:0 10px 10px;-moz-border-radius-bottomright:0;-webkit-border-radius-bottom-right:0}";
 styles += "#gm_basecamp .content > div{display:inline-block}";
 styles += "#gm_basecamp .content .form-actions{display:block}";
@@ -202,8 +202,8 @@ dom('#gm_basecamp .submit')[0].addEventListener('click', function (event) {
   show_complete_label();
 
   var inputs = dom('#gm_basecamp input[type=text]');
-  for (var i = inputs.length-1; i >= 0; i--) {
-    localStorage.setItem(inputs[i].id, inputs[i].value);
+  for (var d = inputs.length-1; d >= 0; d--) {
+    localStorage.setItem(inputs[d].id, inputs[d].value);
   }
   update();
 }, false);
