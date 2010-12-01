@@ -30,8 +30,8 @@ var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456
 var elems = dom('.items_wrapper > div > div[id^=item_]');
 
 var init = function () {
-  for (var i = elems.length-1; i >= 0; i--) {
-    var elem = elems[i],
+  for (var d = elems.length-1; d >= 0; d--) {
+    var elem = elems[d],
       string = elem.innerHTML,
       box = document.createElement('div'),
       id = elem.getAttribute('record'),
@@ -57,22 +57,18 @@ var init = function () {
         elem.addEventListener('mouseover', function () { 
           var url = loc.protocol + '/todo_items/' + id + '/time_entries.xml';  
          
-          // if (localStorage.getItem('spent_time_' + id) == null) {
-            http_request(url, function (xhr) {
-              var hours = xhr.responseXML.getElementsByTagName('hours'),
-                spent_time = 0;
-              
-              for (var i = hours.length - 1; i >= 0; i--) {
-                var hour = hours[i];
-                spent_time += parseFloat(hour.firstChild.nodeValue, 10);
-              }
-              localStorage.setItem('spent_time_' + id, spent_time);
-              localStorage.setItem('estimate_time_' + id, parseFloat(estimate_time, 10));
-              update_progress_bar(id);
-            });
-          // } else {
-          //   update_progress_bar(id);
-          // }
+          http_request(url, function (xhr) {
+            var hours = xhr.responseXML.getElementsByTagName('hours'),
+              spent_time = 0;
+            
+            for (var d = hours.length - 1; d >= 0; d--) {
+              var hour = hours[d];
+              spent_time += parseFloat(hour.firstChild.nodeValue, 10);
+            }
+            localStorage.setItem('spent_time_' + id, spent_time);
+            localStorage.setItem('estimate_time_' + id, parseFloat(estimate_time, 10));
+            update_progress_bar(id);
+          });
         }, false);   
       }
     })(elem, desc_elem);
@@ -92,8 +88,6 @@ var init = function () {
         desc_elem.setAttribute('data-gm-owner', 'false');
       }
     }
-      
-
   }
 };
 
@@ -190,7 +184,7 @@ panel.innerHTML = '' +
     '</div>' +   
     '<div class="action">' + 
       '<button type="submit">submit</button>' +
-    '</div>'
+    '</div>' +
   '</div>'
 ;
 
@@ -203,6 +197,8 @@ style += '#gm_panel h2{margin-top: 0;}';
 style += '#gm_panel .form div{margin-bottom:3px}';
 style += '#gm_panel .form span{color: rgba(255, 255, 255, 0.5);display: block; margin-top:3px}';
 style += '#gm_panel .action{padding:0;border:none;margin-left:1em;float: right;}';
+style += 'a.external{color:#333}';
+style += 'a.external:hover{color:#fff; background-color:#999}';
 GM_addStyle(style);
 
 var key_elem = document.querySelector('#gm_key');
@@ -215,4 +211,15 @@ dom('#gm_panel button')[0].addEventListener('click', function(){
   window.location = window.location.href;
 }, false);
 
+// wrapped link elements for links in time entry comments 
+function link_wrapper () {
+  if (/time_entries/.test(window.location.pathname)) {
+    for (var elems = document.querySelectorAll('.TimeTrack .entry .desc'), d = elems.length - 1; d >= 0; d--) {
+      var elem = elems[d];
+      elem.innerHTML = elem.innerHTML.replace(/(https:\/\/[\d\S-_.\/]+)/i, '<a class="external" href="$1">$1</a>');
+    }
+  }
+}
+
 init();
+link_wrapper();
