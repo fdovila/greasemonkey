@@ -47,13 +47,47 @@ var init = function () {
     desc_elem.parentNode.parentNode.parentNode.appendChild(box);
 
     // show todo id
-    box.innerHTML = '<span class="gm_task"><strong>Task #</strong>' + id + '</span><span class="gm_progress"><span></span><strong>Spent:/Estimated:</strong></span>';
+    box.innerHTML = '<span class="gm_task"><strong>Task #</strong>' + id + '</span>' + 
+      '<span class="gm_progress"><span></span></span>' +
+      // '<strong>Spent:/Estimated:</strong>' + 
+      '<span class="gm_print">Print</span>';
     
-    (function (elem, item) {
+    (function (elem, item, index) {
       var id = elem.getAttribute('record'),
-      estimate_time = item.innerHTML.split(/.*\(([\.:\d].*)h\).*/g)[1];
+        estimate_time = item.innerHTML.split(/.*\(([\.:\d].*)h\).*/g)[1],
+        print = document.querySelector('#item_' + id + ' .gm_print'),
+        loc = window.location,
+        url = loc.protocol + '/todo_items/' + id + '/comments.xml';
+        
+      if (print) {
+        print.addEventListener('click', function () { 
+          var text = document.querySelector('#item_wrap_' + id).innerHTML, 
+          comment_html = '';
+          
+          http_request(url, function (xhr) {
+            var comments = xhr.responseXML.getElementsByTagName('body');
+
+            for (var i = 0, len = comments.length; i < len; i++) {
+              comment_html += comments[i].firstChild.nodeValue;
+              if (i == len - 1) {
+                var container = document.createElement('div'),
+                body = document.querySelector('body');
+                          
+                container.setAttribute('id', 'gm_print_container_' + id);
+                container.style.display = 'block';
+                container.innerHTML = '<div class="story">' + text + '</div><div class="list">' + comment_html + '</div></div>';
+                body.appendChild(container);
+                body.setAttribute('class', body.getAttribute('class') + ' gm_print_process');
+                window.print();
+                body.removeChild(container)
+                body.setAttribute('class', body.getAttribute('class').replace('gm_print', ''));
+              }
+            }
+          });
+        }, false);
+      }
+        
       if (estimate_time) {
-        var loc = window.location;
         elem.addEventListener('mouseover', function () { 
           var url = loc.protocol + '/todo_items/' + id + '/time_entries.xml';  
          
@@ -71,7 +105,7 @@ var init = function () {
           });
         }, false);   
       }
-    })(elem, desc_elem);
+    })(elem, desc_elem, d);
 
     
     // highlighting
@@ -168,6 +202,15 @@ styles += '.item_wrapper:hover{z-index:1;}';
 styles += '[id^=item_]:hover .gm_box{display:block;}';
 styles += 'body.todos div.list a.pill_todo_item,body.todos div.list a.pill_todo_item span.content{background-image:none;}';
 styles += 'table.layout td.left{width:85%}';
+styles += '.gm_print{cursor:pointer;text-decoration: underline;}';
+styles += '.gm_print:hover{text-decoration: none;}';
+
+styles += 'body.gm_print_process > *{display: none;}';
+styles += '[id^=gm_print_container]{max-width:21cm;max-height:29.7cm; background-color: #FFF;padding: 2.5cm 3cm; text-align: left;}';
+styles += '[id^=gm_print_container] .story{ font-size: 18px;}';
+styles += '[id^=gm_print_container] .list{ font-size: 14px; padding: 5mm 1cm;}';
+styles += '[id^=gm_print_container] .list > div{ display: list-item; font-size: 14px;}';
+
 GM_addStyle(styles);
 
 // --------------------------
