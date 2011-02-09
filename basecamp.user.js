@@ -198,18 +198,19 @@ function TodoList () {
   
   function show_points_count_per_list() {
     var lists = dom('.list');
-    
     for (var d = lists.length-1; d >= 0; d--) {
-      var list = lists[d],
+      var point_indicator = /u2605/g, // star sign
+        list = lists[d],
         container = document.createElement('span');
         container.setAttribute('class', 'gm_count');
-        var total_match = list.innerHTML.match(/★/g),
+        var total_match = escape(list.innerHTML).match(point_indicator),
           done_match = list.querySelector('.completed_items_todo_list'), 
           total = total_match && total_match.length || 0, 
-          done = done_match.length > 0 && done_match.innerHTML.match(/★/g).length || 0;
-  
-        container.innerHTML = 'Points <span class="total">Total: ' + (total-done) + '</span> / <span class="done"> Done: ' + done + '</span>';
-        list.querySelector('h2').appendChild(container);      
+          done = done_match.length > 0 && escape(done_match.innerHTML).match(point_indicator).length || 0;
+        if (total > 0) {
+          container.innerHTML = 'Points <span class="total">Total: ' + (total-done) + '</span> / <span class="done"> Done: ' + done + '</span>';
+          list.querySelector('h2').appendChild(container);      
+        }
   
       var style = '';
       style += 'h2 .gm_count { font-size: 12px; background-color:#efefef; float:right; font-size:12px; font-weight:normal; padding:2px 6px; }';
