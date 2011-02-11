@@ -242,7 +242,7 @@ function TodoList () {
           
           comment_html += '' +
             '<li>' + 
-              '<h4>' + author + '</h4>' + 
+              '<h4 class="author">' + author + '</h4>' + 
               '<div class="formatted_text_body">' + convert(body) + '</div>' + 
             '</li>';
         }
@@ -278,19 +278,22 @@ function TodoList () {
         comment_html = '', body;
         
         function add_comments(comment_html) {
-          var container = document.createElement('div');
+          var container = document.createElement('div'),
+            project_title = document.querySelector('#Header h1').innerHTML.replace(/<.*/,'');
   
           body = document.querySelector('body');
           body.setAttribute('class', body.getAttribute('class') + ' gm_print_process');          
           container.setAttribute('id', 'gm_print_container_' + id);
           container.style.display = 'block';
-          container.innerHTML = '<div class="story">' + text + '</div><div class="list">' + comment_html + '</div></div>';
+          container.innerHTML = '<em>' + project_title + '</em>' + 
+            '<div class="gm_task">' + text + '</div>' + 
+            '<div class="gm_comments">' + comment_html + '</div>';
           body.appendChild(container);
         }
         
         function remove_comments() {
           body.removeChild(container)
-          body.setAttribute('class', body.getAttribute('class').replace('gm_print', ''));        
+          body.setAttribute('class', body.getAttribute('class').replace('gm_print_process', ''));        
         }
         if (!!gm_comments) {
           add_comments(gm_comments.innerHTML);
@@ -313,9 +316,15 @@ function TodoList () {
       }, false);
     }
     // styles
-    style += 'body.gm_print_process > * { display:none; }';
-    style += '[id^=gm_print_container] { max-width:21cm; max-height:29.7cm; background-color:#FFF; padding:2.5cm 3cm; text-align:left; }';
-    style += '[id^=gm_print_container] .story { font-size:18px; }';
+    style += 'body.gm_print_process > *, [id^=gm_print_container] h3, [id^=gm_print_container] .author { display:none; }';
+    style += '[id^=gm_print_container] * { font-family: "Lucida Grande",verdana,arial,helvetica,sans-serif; }';
+    style += '[id^=gm_print_container] { background-color:#FFF; padding:0; text-align:left; }';
+    style += '[id^=gm_print_container] { position:relative; }';
+    style += '[id^=gm_print_container] em { position:absolute; bottom:2em; right:-2em; color:#aaa; -webkit-transform: rotate(-90deg); -moz-transform: rotate(-90deg); }';
+    style += '[id^=gm_print_container] ul { marin:0; padding:0; }';
+    style += '[id^=gm_print_container] .gm_task { font-size: 120%; font-weight:bold; }';
+    style += '[id^=gm_print_container] .gm_comments * { font-size: 96%; }';
+    style += '[id^=gm_print_container] .gm_comments > ul { list-style:none; }';
     style += '[id^=gm_print_container] .list { font-size:14px; padding:5mm 1cm; }';
     style += '[id^=gm_print_container] .list > div { display:list-item; font-size:14px; }';
     style += '.gm_print { cursor:pointer; text-decoration:underline; }';
